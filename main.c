@@ -12,6 +12,7 @@ const float xnf = PIf/2.0f;
 const double PI = M_PI;
 const double x0 = -PI/2.0l;
 const double xn = PI/2.0l;
+const double analytical_result = 2.0l;
 int n = 1000000;
 
 #define HLPMSG "Usage: ./<binary> -t/m [-n num_threads] [-f] \
@@ -121,7 +122,9 @@ main(int argc, char *argv[]) {
         }
     }
 
-    printf("The result of numerical integration is %lf\n", result);
-    printf("Time taken (a.u) is %lf\n", end_time - start_time);
+    double error = fabs(result - analytical_result);
+    double percent_error = error * 50;
+    double execution_time = end_time - start_time;
+    printf("%d\t%lf\t%lf\n", n, percent_error, execution_time);
     return 0;
 }
