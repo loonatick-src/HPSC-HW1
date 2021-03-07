@@ -17,5 +17,8 @@ parallel: main.c integrate_parallel.o timer.o
 integrate_parallel.o: integrate.c
 	$(CC) -c integrate.c -o integrate_parallel.o $(PFLAGS)
 
+convergence: serial
+	./convergence_test.sh
+    
 clean:
 	rm *.out

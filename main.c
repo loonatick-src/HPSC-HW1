@@ -55,10 +55,12 @@ main(int argc, char *argv[]) {
                 case('n'):
                     // set number of threads after
                     // checking for inclusion of omp.h
+                    /*
                     if (argnum == argc-1) {
                         fprintf(stderr, HLPMSG);
                         exit(1);
                     }
+                    */
 #                   ifdef _OPENMP
                     omp_set_num_threads((int)(strtol(argv[argnum+1],NULL,10)));
                     argnum += 2;
@@ -69,12 +71,14 @@ main(int argc, char *argv[]) {
 #                   endif
                     break;
                 case('p'):
+                    /*
                     if (argnum == argc-1) {
                         fprintf(stderr, HLPMSG);
                         exit(1);
                     }
+                    */
                     n = (int) strtol(argv[argnum+1],NULL,10);
-                    argnum++;
+                    argnum+=2;
                     break;
                 case('f'):
                     precision = FLOAT;
