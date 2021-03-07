@@ -24,4 +24,4 @@ echo -e "# n\t%error\ttime" >> "$montecarlofile"
 
 make serial
 convergence_test "$trapfile" "a.out" '-t' 10000000  # 1e7
-convergence_test "$montecarlofile" "a.out" '-m' 1000000000  # 1e8
+convergence_test "$montecarlofile" "a.out" '-m' 1000000000  # 1e9
