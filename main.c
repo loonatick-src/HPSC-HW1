@@ -6,15 +6,16 @@
 #include "integrate.h"
 #include "timer.h"
 
-const float PIf = 4.0f * atanf(1.0f);
+const float PIf = (float) M_PI;
 const float x0f = -PIf/2.0f;
 const float xnf = PIf/2.0f;
-const double PI = 4.0l * atan(1.0l);
+const double PI = M_PI;
 const double x0 = -PI/2.0l;
 const double xn = PI/2.0l;
-const int n = 1000000;
+int n = 1000000;
 
-#define HLPMSG "Usage: ./<binary> -t/m <-n num_threads>\n"
+#define HLPMSG "Usage: ./<binary> -t/m [-n num_threads] [-f] \
+[-p num_samples]\n"
 
 
 enum Precision {
@@ -25,12 +26,15 @@ enum Precision {
 
 int
 main(int argc, char *argv[]) {
+
     enum Integrator method;
     enum Precision precision = DOUBLE;  // default precision
+
     if (argc == 1) {
         fprintf(stderr, HLPMSG);
         exit(4);
     }
+
     int argnum = 1;
     while (argnum < argc) {
         if (argv[argnum][0] == '-')
@@ -62,6 +66,14 @@ main(int argc, char *argv[]) {
                     fprintf(stderr, "omp.h has not been included.\n");
                     exit(2);
 #                   endif
+                    break;
+                case('p'):
+                    if (argnum == argc-1) {
+                        fprintf(stderr, HLPMSG);
+                        exit(1);
+                    }
+                    n = (int) strtol(argv[argnum+1],NULL,10);
+                    argnum++;
                     break;
                 case('f'):
                     precision = FLOAT;

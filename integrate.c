@@ -74,5 +74,4 @@ montecarlof(float (*func)(float x), float x0, float xn, int n) {
     }
     return (approx / n) * scale;
 
-    return 0.0f;
 }
