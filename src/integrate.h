@@ -1,6 +1,7 @@
 #ifndef INTEGRATE_H
 #define INTEGRATE_H
 enum Integrator {
+    NONE,
     TRAPEZOID,
     MONTECARLO,
 };
