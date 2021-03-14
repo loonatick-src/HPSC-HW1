@@ -26,12 +26,14 @@ main(int argc, char *argv[]) {
 
     enum Integrator method = NONE;
     int num_stats = 1;
+#   ifdef _OPENMP
+    int num_threads = 1;
+#   endif
 
     if (argc == 1) {
         fprintf(stderr, HLPMSG);
         exit(4);
     }
-
     int argnum = 1;
     while (argnum < argc) {
         if (argv[argnum][0] == '-')
@@ -39,7 +41,14 @@ main(int argc, char *argv[]) {
                 case('t'):
                     // set integration method to trapezoid
                     method = TRAPEZOID;
-                    argnum++;
+                    if (argv[argnum][2] != 's')
+                        argnum++;
+                    else {
+                        num_stats = (int) strtol(argv[argnum+1], NULL, 10);
+                        // fprintf(stderr, ">>>%d<<<\n", num_stats);
+                        assert(num_stats > 1);
+                        argnum += 2;
+                    }
                     break;
 
                 case('m'):
@@ -49,6 +58,7 @@ main(int argc, char *argv[]) {
                         argnum++;
                     else {
                         num_stats = (int) strtol(argv[argnum+1], NULL, 10);
+                        // fprintf(stderr, ">>>%d<<<\n", num_stats);
                         assert(num_stats > 1);
                         argnum += 2;
                     }
@@ -58,7 +68,8 @@ main(int argc, char *argv[]) {
                     // set number of threads after
                     // checking for inclusion of omp.h
 #                   ifdef _OPENMP
-                    omp_set_num_threads((int)(strtol(argv[argnum+1],NULL,10)));
+                    num_threads = (int)(strtol(argv[argnum+1],NULL,10));
+                    omp_set_num_threads(num_threads);
                     argnum += 2;
 #                   endif
 #                   ifndef _OPENMP
@@ -86,7 +97,6 @@ main(int argc, char *argv[]) {
 #endif
 
 #ifdef _OPENMP
-    int num_threads = omp_get_num_threads();
     printf("%d %d %lf %lf %lf %lf %lf\n", num_threads, n, results.result, results.result_deviation, percent_error, results.execution_time, results.time_deviation);
 #endif
     return 0;

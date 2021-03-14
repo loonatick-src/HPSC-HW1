@@ -1,0 +1,138 @@
+\documentclass[a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage[english]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage{minted}
+\usepackage{caption}
+
+
+% figure support
+\usepackage{import}
+\usepackage{xifthen}
+\pdfminorversion=7
+\usepackage{pdfpages}
+\usepackage{transparent}
+\newcommand{\incfig}[1]{%
+    \def\svgwidth{\columnwidth}
+    \import{./figures/}{#1.pdf_tex}
+}
+
+\DeclareMathSymbol{\C}{\mathalpha}{AMSb}{"43}
+\DeclareMathSymbol{\R}{\mathalpha}{AMSb}{"52}
+
+\pdfsuppresswarningpagegroup=1
+\newenvironment{code}{\captionsetup{type=listing}}{}
+\title{ME 766 - HW1}
+\author{Chaitanya Kumar}
+\date{}
+
+\begin{document}
+    \maketitle
+    \section{Serial and OpenMP Codes} 
+
+    Both methods involve an iterative sum without
+    dependencies between different iterations. So,
+    just a straightforward tree reduction works.
+    A slower alternative for implementing a
+    multithreaded sum of this sort would be using
+    a critical section.
+    \subsection*{Trapezoid Rule}
+
+    \begin{code}
+    \inputminted[samepage=false, breaklines, firstline=20, lastline=30]{c}{src/integrate.c}
+    \label{lst:trapezoid_code}
+    \caption{Code for Trapezoid Method}
+    \end{code}
+
+    \subsection*{Monte Carlo Rule}
+    In my first attempt, I tried to use \texttt{rand()} and its analogues, i.e. the thread safe ones.
+    Upon reading the man pages, I realized that
+    these functions are not meant to be used in
+    a multithreaded environment. The reentrant
+    analogues of the random number generators
+    end with a \texttt{\_r}. So, finally I stuck with
+    \texttt{drand48\_r()}, which returns a double
+    in $[0.0,1.0)$, which is pretty much all we need.
+
+    \begin{code}
+    \inputminted[samepage=false, breaklines, firstline=33, lastline=51]{c}{src/integrate.c}
+    \label{lst:montecarlo_code}
+    \caption{Code for Monte Carlo Method}
+    \end{code}  
+
+
+\section{Convergence Test Results}
+    \subsection*{Trapezoid Method}
+    \begin{figure}[!h]
+        \centering
+        \includegraphics[width=0.8\textwidth]{dat/convergence_trapezoid.png}
+        \caption{Percent error with respect to analytical result for trapezoid rule for different number of bins in integration interval}
+        \label{fig:dat-trapezoid_convergence-png}
+    \end{figure}
+    \pagebreak
+    \subsection*{Monte Carlo Method}
+    \begin{figure}[!h]
+        \centering
+        \includegraphics[width=0.8\textwidth]{dat/convergence_montecarlo.png}
+        \caption{Percent error with respect to analytical result for the Monte Carlo code for different number of sample points}
+        \label{fig:dat-convergence_montecarlo-png}
+    \end{figure}
+
+    \pagebreak
+
+    \section{Timing Study of Multithreaded Implementation}
+    Nothing fancy going on here, just took the
+    average of 5 runs for each thread team size.
+    \subsection*{Trapezoid Method}
+    \begin{figure}[!h]
+        \centering
+        \includegraphics[width=0.6\textwidth]{dat/trapezoid_omp.png}
+        \caption{Trapezoid Method for different number of threads, $n = 1\text{e}06$}
+        \label{fig:dat-}
+    \end{figure}
+
+    \subsection*{Monte Carlo Method}
+
+    \begin{figure}[!h]
+        \centering
+        \includegraphics[width=0.6\textwidth]{dat/montecarlo_omp.png}
+        \caption{Monte Carlo Method for different number of threads, $n = 1\text{e}08$}
+        \label{fig:dat-montecarlo_omp-png}
+    \end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Appendix}
+\subsection*{A. Wall Time Code}
+\begin{code}
+\inputminted[samepage=false, breaklines]{c}{src/timer.c}
+\label{lst:timer_src}
+\caption{timer.c}
+\end{code}      
+
+\subsection*{B. Benchmarking Code}
+I guess calling this benchmarking is being generous, but here's the
+code anyway.
+\begin{code}
+\inputminted[samepage=false, breaklines, linenos]{c}{src/testing.c}
+\label{lst:testing_src}
+\caption{testing.c}
+\end{code}      
+
+\subsection*{C. Driver Code}
+\begin{code}
+\inputminted[samepage=false, breaklines, linenos]{c}{src/main.c}
+\label{lst:main_c}
+\caption{main.c}
+\end{code}      
+
+\subsection*{D. makefile}
+\begin{code}
+\inputminted[samepage=false, breaklines]{make}{src/makefile}
+\label{lst:makefile}
+\caption{makefile}
+\end{code}      
+\end{document}
